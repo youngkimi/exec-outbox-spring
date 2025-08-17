@@ -3,7 +3,12 @@ spring:
     name: spring-outbox
 
   datasource:
+    url: jdbc:postgresql://${DATABASE_POSTGRES_HOSTNAME:localhost}:${DATABASE_POSTGRES_PORT:5432}/${DATABASE_POSTGRES_DB:postgres}
+    username: ${DATABASE_POSTGRES_USERNAME:postgres}
+    password: ${DATABASE_POSTGRES_PASSWORD:postgres}
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://${DATABASE_POSTGRES_HOSTNAME}/postgres
-    username: ${DATABASE_POSTGRES_USERNAME}
-    password: ${DATABASE_POSTGRES_PASSWORD}
+
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: none
