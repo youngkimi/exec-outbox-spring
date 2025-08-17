@@ -2,6 +2,10 @@ spring:
   application:
     name: spring-outbox
 
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+
   datasource:
     url: jdbc:postgresql://${DATABASE_POSTGRES_HOSTNAME:localhost}:${DATABASE_POSTGRES_PORT:5432}/${DATABASE_POSTGRES_DB:postgres}
     username: ${DATABASE_POSTGRES_USERNAME:postgres}
@@ -12,3 +16,25 @@ spring:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
       ddl-auto: none
+
+logging:
+  level:
+    root: info
+    org.springframework.jdbc.core: debug
+
+app:
+  timezone: Asia/Seoul             # ???? ??/??? ???
+  bootstrap:
+    enabled: true
+    # ?? 06:05 KST? ????? (??? ??? ?)
+    cron: "0 5 6 * * *"
+    bizkey-prefix: "PNT"
+    cutoff-time: "06:00"           # "?? ?? ?? ??? ??" ??? ?? ????
+
+  worker-id: ${APP_WORKER_ID:${HOSTNAME:local}-${PID:1}}
+  worker:
+    enabled: true
+    poll-interval-ms: 300
+    requeue-interval-ms: 5000
+    lease-secs: 300
+    capacity: 1
