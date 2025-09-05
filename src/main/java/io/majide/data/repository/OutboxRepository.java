@@ -16,16 +16,16 @@ public interface OutboxRepository extends JpaRepository<Outbox, Long> {
     @Modifying
     @Query("""
         update Outbox o
-           set o.status = :to, o.publishedAt = current timestamp, o.attempt = o.attempt + 1
+           set o.status = :to, o.publishedAt = :now, o.attempt = o.attempt + 1
          where o.id = :id and o.status = :expected
         """)
-    int markPublishedIf(Long id, OutboxStatus expected, OutboxStatus to);
+    int markPublishedIf(Long id, OutboxStatus expected, OutboxStatus to, Instant now);
 
     @Modifying
     @Query("""
         update Outbox o
-           set o.status = com.example.orch.domain.OutboxStatus.FAILED, o.attempt = o.attempt + 1
-         where o.id = :id and o.status = com.example.orch.domain.OutboxStatus.NEW
+           set o.status = io.majide.entity.OutboxStatus.FAILED, o.attempt = o.attempt + 1
+         where o.id = :id and o.status = io.majide.entity.OutboxStatus.NEW
         """)
     int markPublishFailed(Long id);
 }

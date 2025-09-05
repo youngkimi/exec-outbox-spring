@@ -15,16 +15,16 @@ public interface DagInstanceRepository extends JpaRepository<DagInstance, Long> 
     @Modifying
     @Query("""
         update DagInstance i
-           set i.status = :to, i.startedAt = coalesce(i.startedAt, current timestamp)
+           set i.status = :to, i.startedAt = coalesce(i.startedAt, :now)
          where i.id = :id and i.status = :expected
         """)
-    int updateStatusIf(Long id, DagInstanceStatus expected, DagInstanceStatus to);
+    int updateStatusIf(Long id, DagInstanceStatus expected, DagInstanceStatus to, Instant now);
 
     @Modifying
     @Query("""
         update DagInstance i
-           set i.status = :to, i.endedAt = current timestamp
+           set i.status = :to, i.endedAt = :now
          where i.id = :id and i.status = :expected
         """)
-    int finishIf(Long id, DagInstanceStatus expected, DagInstanceStatus to);
+    int finishIf(Long id, DagInstanceStatus expected, DagInstanceStatus to, Instant now);
 }

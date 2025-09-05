@@ -25,15 +25,15 @@ public interface TaskRunRepository extends JpaRepository<TaskRun, Long> {
     @Modifying
     @Query("""
         update TaskRun tr
-           set tr.status = com.example.orch.domain.TaskRunStatus.RETRY_WAIT,
+           set tr.status = io.majide.entity.TaskRunStatus.RETRY_WAIT,
                tr.attempt = tr.attempt + 1,
                tr.scheduledAt = :next,
                tr.leaseOwner = null,
                tr.leaseExpireAt = null,
-               tr.endedAt = current timestamp
+               tr.endedAt = :now
          where tr.id = :id
         """)
-    int scheduleRetry(Long id, OffsetDateTime next);
+    int scheduleRetry(Long id, Instant next, Instant now);
 
     // 성공/실패 마킹
     @Modifying
@@ -42,10 +42,10 @@ public interface TaskRunRepository extends JpaRepository<TaskRun, Long> {
            set tr.status = :to,
                tr.leaseOwner = null,
                tr.leaseExpireAt = null,
-               tr.endedAt = current timestamp
+               tr.endedAt = :now
          where tr.id = :id
         """)
-    int complete(Long id, TaskRunStatus to);
+    int complete(Long id, TaskRunStatus to, Instant now);
 
     // 하트비트/임대 연장 (워커가 주기적으로 호출)
     @Modifying
@@ -53,9 +53,9 @@ public interface TaskRunRepository extends JpaRepository<TaskRun, Long> {
         update TaskRun tr
            set tr.heartbeatAt = :hb,
                tr.leaseExpireAt = :leaseExpireAt
-         where tr.id = :id and tr.status = com.example.orch.domain.TaskRunStatus.RUNNING
+         where tr.id = :id and tr.status = io.majide.entity.TaskRunStatus.RUNNING
         """)
-    int heartbeat(Long id, OffsetDateTime hb, OffsetDateTime leaseExpireAt);
+    int heartbeat(Long id, Instant hb, Instant leaseExpireAt);
 
     // 명시적 임대 해제(비정상 종료 복구 등)
     @Modifying

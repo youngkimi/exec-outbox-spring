@@ -3,7 +3,7 @@ package io.youngkimi.springoutbox.data.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.OffsetDateTime;
+import java.time.Instant;
 
 @Entity
 @Table(name = "TB_DAG_INSTANCE",
@@ -37,13 +37,13 @@ public class DagInstance {
     private DagInstanceStatus status;
 
     @Column(name = "created_at", nullable = false)
-    private OffsetDateTime createdAt;
+    private Instant createdAt;
 
     @Column(name = "started_at")
-    private OffsetDateTime startedAt;
+    private Instant startedAt;
 
     @Column(name = "ended_at")
-    private OffsetDateTime endedAt;
+    private Instant endedAt;
 
     @Lob
     @Column(name = "input_params")

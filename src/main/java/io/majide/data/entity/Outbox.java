@@ -3,7 +3,7 @@ package io.youngkimi.springoutbox.data.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.OffsetDateTime;
+import java.time.Instant;
 
 @Entity
 @Table(name = "TB_OUTBOX",
@@ -33,10 +33,10 @@ public class Outbox {
     private String payloadJson;
 
     @Column(name = "created_at", nullable = false)
-    private OffsetDateTime createdAt;
+    private Instant createdAt;
 
     @Column(name = "published_at")
-    private OffsetDateTime publishedAt;
+    private Instant publishedAt;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", length = 16, nullable = false)

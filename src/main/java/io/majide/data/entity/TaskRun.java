@@ -3,7 +3,7 @@ package io.youngkimi.springoutbox.data.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.OffsetDateTime;
+import java.time.Instant;
 
 @Entity
 @Table(name = "TB_TASK_RUN",
@@ -39,19 +39,19 @@ public class TaskRun {
     private String leaseOwner;
 
     @Column(name = "lease_expire_at")
-    private OffsetDateTime leaseExpireAt;
+    private Instant leaseExpireAt;
 
     @Column(name = "heartbeat_at")
-    private OffsetDateTime heartbeatAt;
+    private Instant heartbeatAt;
 
     @Column(name = "scheduled_at")
-    private OffsetDateTime scheduledAt;
+    private Instant scheduledAt;
 
     @Column(name = "started_at")
-    private OffsetDateTime startedAt;
+    private Instant startedAt;
 
     @Column(name = "ended_at")
-    private OffsetDateTime endedAt;
+    private Instant endedAt;
 
     @Column(name = "error_code", length = 120)
     private String errorCode;

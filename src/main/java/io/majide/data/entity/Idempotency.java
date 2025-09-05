@@ -3,7 +3,7 @@ package io.youngkimi.springoutbox.data.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.OffsetDateTime;
+import java.time.Instant;
 
 @Entity
 @Table(name = "TB_IDEMPOTENCY",
@@ -35,5 +35,5 @@ public class Idempotency {
     private String key;
 
     @Column(name = "created_at", nullable = false)
-    private OffsetDateTime createdAt;
+    private Instant createdAt;
 }

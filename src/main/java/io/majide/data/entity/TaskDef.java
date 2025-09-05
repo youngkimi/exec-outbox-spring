@@ -3,7 +3,7 @@ package io.youngkimi.springoutbox.data.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.OffsetDateTime;
+import java.time.Instant;
 
 @Entity
 @Table(name = "TB_TASK_DEF",
@@ -46,8 +46,8 @@ public class TaskDef {
     private Integer priority;
 
     @Column(name = "created_at", nullable = false)
-    private OffsetDateTime createdAt;
+    private Instant createdAt;
 
     @Column(name = "updated_at")
-    private OffsetDateTime updatedAt;
+    private Instant updatedAt;
 }

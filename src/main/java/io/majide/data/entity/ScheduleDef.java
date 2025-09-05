@@ -3,7 +3,7 @@ package io.youngkimi.springoutbox.data.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.OffsetDateTime;
+import java.time.Instant;
 
 @Entity
 @Table(name = "TB_SCHEDULE_DEF",
@@ -31,14 +31,14 @@ public class ScheduleDef {
     private Yn active; // Y/N
 
     @Column(name = "next_fire_at")
-    private OffsetDateTime nextFireAt;
+    private Instant nextFireAt;
 
     @Column(name = "last_fire_at")
-    private OffsetDateTime lastFireAt;
+    private Instant lastFireAt;
 
     @Column(name = "dedupe_window_s", nullable = false)
     private Integer dedupeWindowSeconds;
 
     @Column(name = "created_at", nullable = false)
-    private OffsetDateTime createdAt;
+    private Instant createdAt;
 }
