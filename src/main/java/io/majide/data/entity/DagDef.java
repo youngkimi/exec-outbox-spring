@@ -2,7 +2,6 @@ package io.majide.data.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.Comment;
 
 import java.time.Instant;
 

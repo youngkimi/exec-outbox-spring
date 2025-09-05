@@ -1,11 +1,15 @@
-package io.majide.data.entity;
+package io.majide.data.repository;
 
-import io.majide.domain.OutboxStatus;
+import io.majide.data.entity.OutboxStatus;
+import io.majide.data.entity.Outbox;
 
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.*;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Repository;
 
+import java.time.Instant;
 import java.util.List;
 
 @Repository

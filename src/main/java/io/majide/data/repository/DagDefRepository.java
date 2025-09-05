@@ -1,14 +1,14 @@
-package io.majide.data.entity;
+package io.majide.data.repository;
 
+import io.majide.data.entity.DagDef;
+import io.majide.data.entity.Yn;
+import org.springframework.data.jpa.repository.JpaRepository;
 
-import org.springframework.data.jpa.repository.*;
-import org.springframework.stereotype.Repository;
-
-import java.time.Instant;
 
 import java.util.List;
 import java.util.Optional;
 
+@Repository
 public interface DagDefRepository extends JpaRepository<DagDef, Long> {
     Optional<DagDef> findByNameAndVersion(String name, Integer version);
 
@@ -16,3 +16,4 @@ public interface DagDefRepository extends JpaRepository<DagDef, Long> {
 
     List<DagDef> findByActive(Yn active);
 }
+
