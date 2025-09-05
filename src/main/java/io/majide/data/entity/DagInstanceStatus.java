@@ -1,4 +1,4 @@
-package io.youngkimi.springoutbox.data.entity;
+package io.majide.data.entity;
 
 public enum DagInstanceStatus { 
     CREATED, RUNNING, SUCCEEDED, FAILED, CANCELED

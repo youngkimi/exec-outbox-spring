@@ -1,6 +1,6 @@
-package io.youngkimi.springoutbox;
+package io.majide;
 
-import io.youngkimi.springoutbox.service.DagService;
+import io.majide.service.DagService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 

@@ -1,3 +1,3 @@
-package io.youngkimi.springoutbox.data.entity;
+package io.majide.data.entity;
 
 public enum Yn { Y, N }

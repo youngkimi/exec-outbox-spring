@@ -1,6 +1,6 @@
-package io.youngkimi.springoutbox.data.entity;
+package io.majide.data.entity;
 
-import io.youngkimi.springoutbox.domain.OutboxStatus;
+import io.majide.domain.OutboxStatus;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.*;

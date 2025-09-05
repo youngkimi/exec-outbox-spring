@@ -1,4 +1,4 @@
-package io.youngkimi.springoutbox;
+package io.majide;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

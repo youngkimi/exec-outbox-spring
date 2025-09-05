@@ -1,4 +1,4 @@
-package io.youngkimi.springoutbox.data.entity;
+package io.majide.data.entity;
 
 import org.springframework.data.jpa.repository.*;
 import org.springframework.stereotype.Repository;

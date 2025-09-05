@@ -1,4 +1,4 @@
-package io.youngkimi.springoutbox.data.entity;
+package io.majide.data.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
