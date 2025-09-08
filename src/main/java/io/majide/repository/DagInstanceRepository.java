@@ -17,7 +17,6 @@ public interface DagInstanceRepository extends JpaRepository<DagInstance, Long> 
 
     List<DagInstance> findByDagIdOrderByCreatedAtDesc(Long dagId);
 
-    // 상태 전이(낙관적 제어): 기대 상태일 때만 변경
     @Modifying
     @Query("""
         update DagInstance i

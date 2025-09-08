@@ -22,11 +22,15 @@ public class PgTaskRunClaimDao implements TaskRunClaimDao {
     public Optional<Claim> claimNextReady(String workerId, Instant now) {
         var sql = """
         WITH cte AS (
-          SELECT tr.run_id, tr.task_id
+          SELECT tr.run_id
             FROM tb_task_run tr
+            JOIN tb_dag_instance di ON di.instance_id = tr.instance_id
+            JOIN tb_dag_def dd ON dd.dag_id = di.dag_id
            WHERE tr.status = 'READY'
              AND tr.scheduled_at <= :now
              AND (tr.lease_expire_at IS NULL OR tr.lease_expire_at <= :now)
+             AND di.status IN ('CREATED','RUNNING')
+             AND dd.is_active = true
            ORDER BY tr.scheduled_at ASC
            FOR UPDATE SKIP LOCKED
            LIMIT 1
@@ -34,9 +38,10 @@ public class PgTaskRunClaimDao implements TaskRunClaimDao {
           UPDATE tb_task_run t
              SET status = 'RUNNING',
                  lease_owner = :worker,
-                 lease_expire_at = :leaseExpire,
+                 lease_expire_at = :now + make_interval(secs => d.timeout_sec),
                  started_at = COALESCE(t.started_at, :now)
             FROM cte
+            JOIN tb_task_def d ON d.task_id = t.task_id
            WHERE t.run_id = cte.run_id
           RETURNING t.run_id, t.instance_id, t.task_id
         )
@@ -49,21 +54,17 @@ public class PgTaskRunClaimDao implements TaskRunClaimDao {
 
         var params = new MapSqlParameterSource()
                 .addValue("now", now)
-                .addValue("worker", workerId)
-                .addValue("leaseExpire", now.plusSeconds(3600)); // 기본 1h, 곧바로 덮어씌움
+                .addValue("worker", workerId);
 
         return tpl.query(sql, params, rs -> {
             if (!rs.next()) return Optional.empty();
-            var timeout = rs.getInt("timeout_sec");
-            // lease를 task timeout에 맞춰 다시 세팅(돌려쓰기 방지 위해 UPDATE 2회 피하려면 위에서 계산해 전달하는 구조로 가도 OK)
-            // 간결하게 여기선 반환만 하고, 워커가 바로 heartbeat(now, now+timeout)로 정밀 세팅하도록 권장.
             return Optional.of(new Claim(
                     rs.getLong("run_id"),
                     rs.getLong("instance_id"),
                     rs.getLong("task_id"),
                     rs.getString("handler_bean"),
                     rs.getString("handler_class"),
-                    timeout,
+                    rs.getInt("timeout_sec"),
                     rs.getInt("max_attempts"),
                     rs.getInt("retry_backoff_ms")
             ));

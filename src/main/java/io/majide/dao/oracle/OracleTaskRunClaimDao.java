@@ -20,62 +20,66 @@ public class OracleTaskRunClaimDao implements TaskRunClaimDao {
 
     @Override
     public Optional<Claim> claimNextReady(String workerId, Instant now) {
-        // 1) 후보 하나 잠그기
         var pickSql = """
-            SELECT run_id, task_id
-              FROM TB_TASK_RUN
-             WHERE status = 'READY'
-               AND scheduled_at <= :now
-               AND (lease_expire_at IS NULL OR lease_expire_at <= :now)
+            SELECT tr.run_id
+              FROM TB_TASK_RUN tr
+              JOIN TB_DAG_INSTANCE di ON di.instance_id = tr.instance_id
+              JOIN TB_DAG_DEF dd ON dd.dag_id = di.dag_id
+             WHERE tr.status = 'READY'
+               AND tr.scheduled_at <= :now
+               AND (tr.lease_expire_at IS NULL OR tr.lease_expire_at <= :now)
+               AND di.status IN ('CREATED','RUNNING')
+               AND dd.is_active = 'Y'
              FOR UPDATE SKIP LOCKED
              FETCH FIRST 1 ROWS ONLY
         """;
         var picked = tpl.query(pickSql, Map.of("now", now), rs -> rs.next()
-                ? Map.of("runId", rs.getLong("run_id"), "taskId", rs.getLong("task_id"))
-                : null
-        );
+                ? rs.getLong("run_id") : null);
         if (picked == null) return Optional.empty();
 
-        long runId = (long) picked.get("runId");
-        long taskId = (long) picked.get("taskId");
+        long runId = picked;
 
-        // 2) RUNNING 전이
         var updSql = """
-            UPDATE TB_TASK_RUN
-               SET status = 'RUNNING',
-                   lease_owner = :worker,
-                   lease_expire_at = :leaseExpire,
-                   started_at = COALESCE(started_at, :now)
-             WHERE run_id = :runId
+            UPDATE TB_TASK_RUN t
+               SET t.status = 'RUNNING',
+                   t.lease_owner = :worker,
+                   t.lease_expire_at = :leaseExpire,
+                   t.started_at = COALESCE(t.started_at, :now)
+             WHERE t.run_id = :runId
         """;
+
+        var meta1 = tpl.queryForMap("""
+            SELECT d.timeout_sec, t.task_id, t.instance_id
+              FROM TB_TASK_RUN t
+              JOIN TB_TASK_DEF d ON d.task_id = t.task_id
+             WHERE t.run_id = :runId
+        """, Map.of("runId", runId));
+
+        int timeoutSec = ((Number) meta1.get("TIMEOUT_SEC")).intValue();
+        long taskId = ((Number) meta1.get("TASK_ID")).longValue();
+        long instanceId = ((Number) meta1.get("INSTANCE_ID")).longValue();
+
         tpl.update(updSql, new MapSqlParameterSource()
                 .addValue("worker", workerId)
-                .addValue("leaseExpire", now.plusSeconds(3600)) // 임시(워커에서 heartbeat로 정확히 설정)
+                .addValue("leaseExpire", now.plusSeconds(timeoutSec))
                 .addValue("now", now)
                 .addValue("runId", runId)
         );
 
-        // 3) 실행 메타 조회
         var metaSql = """
-            SELECT tr.run_id, tr.instance_id, tr.task_id,
-                   d.handler_bean, d.handler_class,
-                   d.timeout_sec, d.max_attempts, d.retry_backoff_ms
-              FROM TB_TASK_RUN tr
-              JOIN TB_TASK_DEF d ON d.task_id = tr.task_id
-             WHERE tr.run_id = :runId
+            SELECT d.handler_bean, d.handler_class, d.max_attempts, d.retry_backoff_ms
+              FROM TB_TASK_DEF d
+             WHERE d.task_id = :taskId
         """;
-        return tpl.query(metaSql, Map.of("runId", runId), rs -> {
-            if (!rs.next()) return Optional.empty();
-            return Optional.of(new Claim(
-                    rs.getLong("run_id"),
-                    rs.getLong("instance_id"),
-                    rs.getLong("task_id"),
-                    rs.getString("handler_bean"),
-                    rs.getString("handler_class"),
-                    rs.getInt("timeout_sec"),
-                    rs.getInt("max_attempts"),
-                    rs.getInt("retry_backoff_ms")
-            ));
-        });
+        var meta2 = tpl.queryForMap(metaSql, Map.of("taskId", taskId));
+
+        return Optional.of(new Claim(
+                runId, instanceId, taskId,
+                (String) meta2.get("HANDLER_BEAN"),
+                (String) meta2.get("HANDLER_CLASS"),
+                timeoutSec,
+                ((Number) meta2.get("MAX_ATTEMPTS")).intValue(),
+                ((Number) meta2.get("RETRY_BACKOFF_MS")).intValue()
+        ));
     }
 }

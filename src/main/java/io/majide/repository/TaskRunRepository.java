@@ -21,7 +21,6 @@ public interface TaskRunRepository extends JpaRepository<TaskRun, Long> {
 
     List<TaskRun> findByInstanceIdAndStatus(Long instanceId, TaskRunStatus status);
 
-    // 상태 전이(낙관적 제어)
     @Modifying
     @Query("""
         update TaskRun tr
@@ -30,7 +29,6 @@ public interface TaskRunRepository extends JpaRepository<TaskRun, Long> {
         """)
     int updateStatusIf(Long id, TaskRunStatus expected, TaskRunStatus to);
 
-    // 재시도 스케줄링: attempt +1, 다음 실행 시각 예약
     @Modifying
     @Query("""
         update TaskRun tr
@@ -44,7 +42,6 @@ public interface TaskRunRepository extends JpaRepository<TaskRun, Long> {
         """)
     int scheduleRetry(Long id, Instant next, Instant now);
 
-    // 성공/실패 마킹
     @Modifying
     @Query("""
         update TaskRun tr
@@ -56,7 +53,6 @@ public interface TaskRunRepository extends JpaRepository<TaskRun, Long> {
         """)
     int complete(Long id, TaskRunStatus to, Instant now);
 
-    // 하트비트/임대 연장 (워커가 주기적으로 호출)
     @Modifying
     @Query("""
         update TaskRun tr
@@ -66,7 +62,6 @@ public interface TaskRunRepository extends JpaRepository<TaskRun, Long> {
         """)
     int heartbeat(Long id, Instant hb, Instant leaseExpireAt);
 
-    // 명시적 임대 해제(비정상 종료 복구 등)
     @Modifying
     @Query("""
         update TaskRun tr
@@ -75,4 +70,10 @@ public interface TaskRunRepository extends JpaRepository<TaskRun, Long> {
          where tr.id = :id
         """)
     int releaseLease(Long id);
+
+    @QueryHints(
+        @QueryHint(name = HibernateHints.HINT_READ_ONLY, value = "true")
+    )
+    List<TaskRun> findByStatusAndLeaseExpireAtBeforeOrderByLeaseExpireAtAsc(
+            TaskRunStatus status, Instant before, Pageable pageable);
 }
