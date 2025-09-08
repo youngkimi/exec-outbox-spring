@@ -1,4 +1,4 @@
-package io.youngkimi.springoutbox
+package io.majide
 
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
