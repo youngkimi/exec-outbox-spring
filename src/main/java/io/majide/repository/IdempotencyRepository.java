@@ -1,6 +1,6 @@
-package io.majide.data.repository;
+package io.majide.repository;
 
-import io.majide.data.entity.Idempotency;
+import io.majide.domain.Idempotency;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

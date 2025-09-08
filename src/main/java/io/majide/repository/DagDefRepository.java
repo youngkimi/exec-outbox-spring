@@ -1,7 +1,7 @@
-package io.majide.data.repository;
+package io.majide.repository;
 
-import io.majide.data.entity.DagDef;
-import io.majide.data.entity.Yn;
+import io.majide.domain.DagDef;
+import io.majide.domain.Yn;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 

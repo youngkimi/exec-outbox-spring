@@ -1,7 +1,7 @@
-package io.majide.data.repository;
+package io.majide.repository;
 
-import io.majide.data.entity.TaskRun;
-import io.majide.data.entity.TaskRunStatus;
+import io.majide.domain.TaskRun;
+import io.majide.domain.TaskRunStatus;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

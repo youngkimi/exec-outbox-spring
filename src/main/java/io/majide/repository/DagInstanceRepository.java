@@ -1,7 +1,7 @@
-package io.majide.data.repository;
+package io.majide.repository;
 
-import io.majide.data.entity.DagInstance;
-import io.majide.data.entity.DagInstanceStatus;
+import io.majide.domain.DagInstance;
+import io.majide.domain.DagInstanceStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.jpa.repository.Modifying;

@@ -1,4 +1,4 @@
-package io.majide.data.repository;
+package io.majide.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

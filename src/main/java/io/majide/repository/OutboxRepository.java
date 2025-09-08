@@ -1,7 +1,7 @@
-package io.majide.data.repository;
+package io.majide.repository;
 
-import io.majide.data.entity.OutboxStatus;
-import io.majide.data.entity.Outbox;
+import io.majide.domain.OutboxStatus;
+import io.majide.domain.Outbox;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

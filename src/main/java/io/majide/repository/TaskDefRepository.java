@@ -1,7 +1,7 @@
-package io.majide.data.repository;
+package io.majide.repository;
 
-import io.majide.data.entity.TaskDef;
-import io.majide.data.entity.DagDef;
+import io.majide.domain.TaskDef;
+import io.majide.domain.DagDef;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
