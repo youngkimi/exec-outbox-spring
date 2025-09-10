@@ -15,23 +15,24 @@ public class TaskResolver {
     private final ApplicationContext appCtx;
     private final AutowireCapableBeanFactory factory;
 
-    public TaskHandler<?,?> resolve(TaskDef def) {
+    public TaskHandler<Map<String,Object>, Map<String,Object>> resolve(TaskDef def) {
+        Object beanOrObj;
         if (def.getHandlerBean() != null && !def.getHandlerBean().isBlank()) {
-            Object bean = appCtx.getBean(def.getHandlerBean());
-            return cast(bean, def);
-        }
-        if (def.getHandlerClass() != null && !def.getHandlerClass().isBlank()) {
+            beanOrObj = appCtx.getBean(def.getHandlerBean());
+        } else if (def.getHandlerClass() != null && !def.getHandlerClass().isBlank()) {
             Class<?> clazz = ClassUtils.resolveClassName(def.getHandlerClass(), appCtx.getClassLoader());
-            Object bean = factory.createBean(clazz);
-            return cast(bean, def);
+            beanOrObj = factory.createBean(clazz);
+        } else {
+            throw new IllegalStateException("No handler configured for taskKey=" + def.getTaskKey());
         }
-        throw new IllegalStateException("No handler configured for taskKey=" + def.getTaskKey());
-    }
 
-    private TaskHandler<?,?> cast(Object o, TaskDef def) {
-        if (!(o instanceof TaskHandler<?,?> h)) {
+        if (!(beanOrObj instanceof TaskHandler<?, ?> h)) {
             throw new IllegalStateException("Handler does not implement TaskHandler: " + def);
         }
-        return h;
+
+        @SuppressWarnings("unchecked")
+        TaskHandler<Map<String,Object>, Map<String,Object>> typed =
+                (TaskHandler<Map<String,Object>, Map<String,Object>>) h;
+        return typed;
     }
 }
